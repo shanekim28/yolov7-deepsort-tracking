@@ -6,6 +6,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # comment out below line to enable tensorflow logging outputs
 import time
 import tensorflow as tf
+import json
 
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -59,7 +60,8 @@ class YOLOv7_DeepSORT:
         self.tracker = Tracker(metric) # initialize tracker
 
 
-    def track_video(self,video:str, output:str, skip_frames:int=0, show_live:bool=False, count_objects:bool=False, verbose:int = 0):
+    def track_video(self,video:str, output:str, output_json:str, skip_frames:int=0, show_live:bool=False, count_objects:bool=False, verbose:int = 0):
+        output_dict = {}
         '''
         Track any given webcam or video
         args: 
@@ -142,6 +144,7 @@ class YOLOv7_DeepSORT:
             self.tracker.predict()  # Call the tracker
             self.tracker.update(detections) #  updtate using Kalman Gain
 
+            output_dict[frame_num] = {}
             for track in self.tracker.tracks:  # update new findings AKA tracks
                 if not track.is_confirmed() or track.time_since_update > 1:
                     continue 
@@ -156,6 +159,11 @@ class YOLOv7_DeepSORT:
 
                 if verbose == 2:
                     print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id), class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
+
+                output_dict[frame_num][f'{str(track.track_id)}'] = {
+                    'class': class_name,
+                    'tlbr': [ bbox[0], bbox[1], bbox[2], bbox[3]]
+                }
                     
             # -------------------------------- Tracker work ENDS here -----------------------------------------------------------------------
             if verbose >= 1:
@@ -165,6 +173,10 @@ class YOLOv7_DeepSORT:
             
             result = np.asarray(frame)
             result = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+            if output_json: 
+                with open(output_json, 'w') as outfile:
+                    outfile.write(json.dumps(output_dict))
             
             if output: out.write(result) # save output video
 
