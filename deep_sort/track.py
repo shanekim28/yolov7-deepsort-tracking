@@ -63,7 +63,7 @@ class Track:
 
     """
 
-    def __init__(self, mean, covariance, track_id, n_init, max_age,
+    def __init__(self, mean, covariance, track_id, n_init, max_age, conf,
                  feature=None, class_name=None):
         self.mean = mean
         self.covariance = covariance
@@ -71,6 +71,7 @@ class Track:
         self.hits = 1
         self.age = 1
         self.time_since_update = 0
+        self.score = conf
 
         self.state = TrackState.Tentative
         self.features = []
@@ -112,6 +113,9 @@ class Track:
     
     def get_class(self):
         return self.class_name
+    
+    def get_score(self):
+        return self.score
 
     def predict(self, kf):
         """Propagate the state distribution to the current time step using a
@@ -145,6 +149,7 @@ class Track:
 
         self.hits += 1
         self.time_since_update = 0
+        self.score = detection.confidence
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
             self.state = TrackState.Confirmed
 
