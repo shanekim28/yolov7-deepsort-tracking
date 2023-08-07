@@ -157,8 +157,10 @@ class YOLOv7_DeepSORT:
                 cv2.rectangle(frame, (int(bbox[0]), int(bbox[1]-30)), (int(bbox[0])+(len(class_name)+len(str(track.track_id)))*17, int(bbox[1])), color, -1)
                 cv2.putText(frame, class_name + " : " + str(track.track_id),(int(bbox[0]), int(bbox[1]-11)),0, 0.6, (255,255,255),1, lineType=cv2.LINE_AA)    
 
+                score = scores[int(track.track_id)]
+
                 if verbose == 2:
-                    print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id), class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
+                    print("Tracker ID: {}, Class: {} (conf. {}),  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id), class_name, score, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
 
                 output_dict[frame_num][f'{str(track.track_id)}'] = {
                     'class': class_name,
