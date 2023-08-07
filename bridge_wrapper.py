@@ -164,7 +164,8 @@ class YOLOv7_DeepSORT:
 
                 output_dict[frame_num][f'{str(track.track_id)}'] = {
                     'class': class_name,
-                    'tlbr': [ bbox[0], bbox[1], bbox[2], bbox[3]]
+                    'tlbr': [ bbox[0], bbox[1], bbox[2], bbox[3]],
+                    'score': score
                 }
                     
             # -------------------------------- Tracker work ENDS here -----------------------------------------------------------------------
