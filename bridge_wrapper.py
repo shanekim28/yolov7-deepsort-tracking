@@ -145,6 +145,7 @@ class YOLOv7_DeepSORT:
             self.tracker.update(detections) #  updtate using Kalman Gain
 
             output_dict[frame_num] = {}
+            objects = {}
             for track in self.tracker.tracks:  # update new findings AKA tracks
                 if not track.is_confirmed() or track.time_since_update > 1:
                     continue 
@@ -162,11 +163,13 @@ class YOLOv7_DeepSORT:
                 if verbose == 2:
                     print("Tracker ID: {}, Class: {} (conf. {}),  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id), class_name, score, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
 
-                output_dict[frame_num][f'{str(track.track_id)}'] = {
+                objects[f'{str(track.track_id)}'] = {
                     'class': class_name,
                     'tlbr': [ bbox[0], bbox[1], bbox[2], bbox[3]],
                     'score': score
                 }
+                output_dict[frame_num]["objects"] = objects
+                objects = {}
                     
             # -------------------------------- Tracker work ENDS here -----------------------------------------------------------------------
             if verbose >= 1:
@@ -179,7 +182,7 @@ class YOLOv7_DeepSORT:
 
             if output_json: 
                 with open(output_json, 'w') as outfile:
-                    outfile.write(json.dumps(output_dict))
+                    outfile.write(json.dumps({"frames": output_dict}))
             
             if output: out.write(result) # save output video
 
