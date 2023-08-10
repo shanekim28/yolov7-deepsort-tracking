@@ -168,8 +168,8 @@ class YOLOv7_DeepSORT:
                     'tlbr': [ bbox[0], bbox[1], bbox[2], bbox[3]],
                     'score': score
                 }
-                output_dict[frame_num]["objects"] = objects
-                objects = {}
+                
+            output_dict[frame_num]["objects"] = objects
                     
             # -------------------------------- Tracker work ENDS here -----------------------------------------------------------------------
             if verbose >= 1:
